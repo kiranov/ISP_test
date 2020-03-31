@@ -1,9 +1,17 @@
 quickstart:
-There are 2 ways to start app:
+There are 3 ways to start app:
 	1)create virtual env(it's unnecessary)
 	2)you should install all from requirements.txt
 	3)execute command: python3 app.py
 
-	using docker:
-		ADD file:594fa35cf803361e69d817fc867b6a4069c064ffd20ed50caf42ad9bb11ca999 in / path
-		на всякий случай сслыка на docker_hub https://hub.docker.com/repository/docker/kiranov/my_app/general
+	using dockerfile:
+	1)docker build -t my_app:v0.2 .
+	2)docker run -d -p 5000:5000 my_app:v0.2
+	3)docker stop #CONTAINER ID
+		
+	using docker_hub:
+		download: docker pull kiranov/my_app:v0.2
+		run:docker run -d -p 5000:5000 my_app:v0.2
+			if necessary to check status: docker ps -a
+			to stop: docker stop #CONTAINER ID
+		link to docker_hub https://hub.docker.com/repository/docker/kiranov/my_app/general
