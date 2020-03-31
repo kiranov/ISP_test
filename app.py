@@ -16,7 +16,7 @@ def stupid_compare(sum_of_intensity, pattern):
     return False
 
 
-UPLOAD_FOLDER = './downloads'
+UPLOAD_FOLDER = './service/downloads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 APP = Flask(__name__)
