@@ -11,7 +11,7 @@ def stupid_compare(summ, pattern):
         return True
     return False
 
-UPLOAD_FOLDER = '/home/dmitry/Рабочий стол/MIPT/ISP_test/git/service/downloads'
+UPLOAD_FOLDER = './downloads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
@@ -93,4 +93,4 @@ def uploaded_file(filename):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(host='0.0.0.0')
