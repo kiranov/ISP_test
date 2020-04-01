@@ -65,7 +65,39 @@ def trimming_edges(sum_of_intensity, max_intensity, k):
     return left_edge, right_edge
 
 
-def detector(image, k=0.97986979, size=int(10.17013889),
+class detector:
+    '''detector of the columns'''
+    def __init__(self, image):
+        self.image = image
+        self.intensity_param = 0.97986979
+        self.gap = int(10.17013889)
+        self.column_width = int(29.88541667)
+
+    def algorithm(self):
+        gray = rgb2gray(self.image)
+        sum_of_intensity = gray.sum(axis=0)
+        max_intensity = max(sum_of_intensity)
+        pattern = np.ones(self.gap) * max_intensity * self.intensity_param
+        left_edge, right_edge = trimming_edges(sum_of_intensity, max_intensity,
+                                               self.intensity_param)
+        if(left_edge == -1):
+            return "too sparse document"
+        first_index = left_edge - 1
+        while left_edge < len(sum_of_intensity)-self.gap-1-right_edge:
+            if (sum_of_intensity[left_edge] >=
+                    max_intensity * self.intensity_param):
+                second_index = left_edge
+                if second_index - first_index <= self.column_width:
+                    first_index = second_index
+                else:
+                    if stupid_compare(sum_of_intensity[left_edge:
+                                      left_edge+self.gap], pattern):
+                        return "Many Columns"
+            left_edge += 1
+        return "One Column"
+
+
+def Detector(image, k=0.97986979, size=int(10.17013889),
              length=int(29.88541667)):
     '''detector of the columns'''
     gray = rgb2gray(image)
@@ -92,7 +124,8 @@ def detector(image, k=0.97986979, size=int(10.17013889),
 @APP.route('/uploads/<filename>')
 def uploaded_file(filename):
     '''page with the results of the algorithm'''
-    result = detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
+    solution = detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
+    result = solution.algorithm()
     result += '''<div><button style="margin=20px;"
     onclick="window.location='/'">Back</button></div>'''
     return result
