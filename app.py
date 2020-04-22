@@ -65,7 +65,7 @@ def trimming_edges(sum_of_intensity, max_intensity, k):
     return left_edge, right_edge
 
 
-class detector:
+class Detector:
     '''detector of the columns'''
     def __init__(self, image):
         self.image = image
@@ -97,7 +97,7 @@ class detector:
         return "One Column"
 
 
-def Detector(image, k=0.97986979, size=int(10.17013889),
+def detector(image, k=0.97986979, size=int(10.17013889),
              length=int(29.88541667)):
     '''detector of the columns'''
     gray = rgb2gray(image)
@@ -124,7 +124,7 @@ def Detector(image, k=0.97986979, size=int(10.17013889),
 @APP.route('/uploads/<filename>')
 def uploaded_file(filename):
     '''page with the results of the algorithm'''
-    solution = detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
+    solution = Detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
     result = solution.algorithm()
     result += '''<div><button style="margin=20px;"
     onclick="window.location='/'">Back</button></div>'''
