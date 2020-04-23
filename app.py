@@ -2,6 +2,8 @@
 import os
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
+from sklearn.externals import joblib
+import pandas as pd
 
 
 import numpy as np
@@ -97,6 +99,43 @@ class Detector:
         return "One Column"
 
 
+def preprocessing(image, size1=30, size2=30):
+    '''pre processing input data'''
+    column_line = {}
+    data = pd.DataFrame({})
+    gray = rgb2gray(image)
+    line = 1
+    step = int(gray.shape[0] / size2)
+    nil = 0
+    while line <= size2:
+        if(line == size2):
+            pattern = gray[nil:gray.shape[0]]
+        else:
+            pattern = gray[nil:step*line]
+        summ = pattern.sum(axis=0)
+        result_vector = []
+        j = 0
+        column_summ = 0
+        while j != summ.shape[0]-1:
+            column_summ += summ[j]
+            if len(result_vector) < size1-1:
+                if (j+1) % (int(summ.shape[0]/size1)) == 0:
+                    result_vector.append(column_summ)
+                    column_summ = 0
+            j += 1
+        result_vector.append(column_summ)
+        l1 = 1
+        while l1 <= size1:
+            string = 'column_' + str(line)
+            string += str(l1)
+            column_line[string] = result_vector[l1-1]
+            l1 += 1
+        nil = step * line
+        line += 1
+    data = data.append(column_line, ignore_index=True)
+    return data
+
+
 def detector(image, k=0.97986979, size=int(10.17013889),
              length=int(29.88541667)):
     '''detector of the columns'''
@@ -124,8 +163,17 @@ def detector(image, k=0.97986979, size=int(10.17013889),
 @APP.route('/uploads/<filename>')
 def uploaded_file(filename):
     '''page with the results of the algorithm'''
-    solution = Detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
-    result = solution.algorithm()
+    '''method.pkl - trained GBoost with paramaters (30, 30)'''
+    _joblib = joblib.load('method.pkl')
+    result = int(_joblib.predict(preprocessing(
+        plt.imread(UPLOAD_FOLDER + '/' + filename)
+        )))
+    if result == 0:
+        result = 'One column'
+    else:
+        result = 'Many Columns'
+    # solution = Detector(plt.imread(UPLOAD_FOLDER + '/' + filename))
+    # result = solution.algorithm()
     result += '''<div><button style="margin=20px;"
     onclick="window.location='/'">Back</button></div>'''
     return result
